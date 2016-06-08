@@ -174,3 +174,31 @@ plot.kwic <- function(..., scale = c("absolute", "relative")) {
 }
 
 
+frequency_plot <- function(x,  docvar='name', feature) {
+
+    if ('name' %in% colnames(docvars(x)))
+        warning('Using names of documents, not name docvar')
+
+    corpusDocvars <- docvars(x)
+    corpusDocvars$name <- rownames(docvars(x))
+
+    corpusDfm <- dfm(x)
+
+    featureMatrix <- as.matrix(
+        inaugDfm[,feature]
+    )
+
+    features <- data.table::data.table(featureMatrix)
+    names(features) <- 'freq'
+    features$docs <- rownames(featureMatrix)
+
+    features$docvar <- corpusDocvars[,docvar]
+
+    features <- features[,list(freq=sum(freq)),by=docvar]
+
+    theme_set(theme_bw())
+
+    ggplot2::ggplot(features) + ggplot2::aes(x=docvar, y=freq) + ggplot2::geom_point() +
+        ggplot2::labs(y=paste0("frequency of '", feature, "'"))
+
+} 
