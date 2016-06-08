@@ -202,3 +202,21 @@ frequency_plot <- function(x,  docvar='name', feature) {
         ggplot2::labs(y=paste0("frequency of '", feature, "'"))
 
 } 
+
+zipf_plot <- function(x) {
+    frequencyDist <- colSums(dfm(x))
+
+    df <- data.frame(
+       list(
+           token=names(frequencyDist),
+           frequency=unname(frequencyDist)
+       )
+    )
+
+    df$rank <- max(rank(df$frequency)) - rank(df$frequency)
+
+    ggplot(df) + aes(x=rank, y=frequency) + geom_point() + geom_line() + 
+        scale_x_log10() + scale_y_log10() +
+        coord_fixed() + 
+        labs(x='Absolute frequency of token', y='Frequency rank of token', title='Zipf plot')
+}
